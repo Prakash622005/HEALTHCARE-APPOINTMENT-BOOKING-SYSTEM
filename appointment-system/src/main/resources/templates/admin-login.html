@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 300px;
+            text-align: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Admin Login</h2>
+
+    <form th:action="@{/admin/login}" method="post">
+        <label>Username:</label>
+        <input type="text" name="username" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+
+        <p style="color:red;" th:text="${error}"></p>
+    </form>
+
+</div>
+</body>
+</html>

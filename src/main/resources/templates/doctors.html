@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Available Doctors - HABS</title>
+    <link rel="stylesheet" href="doctors.css" />
+    <style>
+      /* --- Royal Purple-Blue Theme --- */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+h2 {
+    color: white;
+    font-size: 2.5rem;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    margin-bottom: 30px;
+}
+
+/* --- Search Section --- */
+.search-box {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#search {
+    width: 60%;
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+#btnSearch {
+    background: #feb47b; /* Contrasting Golden/Orange */
+    color: #4a148c;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+#btnSearch:hover {
+    transform: scale(1.05);
+    background: white;
+}
+
+/* --- Doctor Card Grid --- */
+#list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 20px;
+}
+
+.doctor-card {
+    background: rgba(255, 255, 255, 0.15); /* Glass effect */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 20px;
+    color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.doctor-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.doc-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.doctor-card h3 {
+    margin: 10px 0 5px 0;
+    font-size: 1.4rem;
+}
+
+.spec {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+/* --- Booking Button --- */
+.book-btn {
+    background: white;
+    color: #764ba2;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.book-btn:hover {
+    background: #7367f0;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Available Specialists</h2>
+    <div class="search-box">
+        <input id="search" placeholder="Search by specialization (e.g., Cardio)"/>
+        <button id="btnSearch">Search</button>
+    </div>
+    
+    <div id="list">
+        </div>
+</div>
+
+<script>
+    // Fixed Search Logic
+    async function load(q = '') {
+        try {
+            const list = document.getElementById('list');
+            list.innerHTML = '<p style="color:white">Loading doctors...</p>';
+            
+            const res = await fetch('/api/doctors/search?q=' + encodeURIComponent(q));
+            const data = await res.json();
+            
+            list.innerHTML = ''; // Clear loading text
+            
+            if (data.length === 0) {
+                list.innerHTML = '<p style="color:white">No doctors found for this specialization.</p>';
+                return;
+            }
+
+            data.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'doctor-card'; // Added class for CSS styling
+                div.innerHTML = `
+                    <div class="doc-icon">👨‍⚕️</div>
+                    <h3>${d.name}</h3>
+                    <p class="spec">${d.specialization || 'General Physician'}</p>
+                    <button class="book-btn" onclick="book(${d.id})">Book Appointment</button>
+                `;
+                list.appendChild(div);
+            });
+        } catch (err) {
+            console.error("Search failed:", err);
+        }
+    }
+
+    // Event Listeners
+    document.getElementById('btnSearch').addEventListener('click', () => {
+        load(document.getElementById('search').value);
+    });
+
+    // Allow searching by pressing "Enter" key
+    document.getElementById('search').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') load(document.getElementById('search').value);
+    });
+
+    // Initial Load
+    load();
+
+    function book(docId) {
+        const token = localStorage.getItem('token');
+        const patientId = localStorage.getItem('userId'); // Ensure this matches your login key
+        
+        if (!token || !patientId) {
+            alert('Please login first');
+            location.href = '/login';
+            return;
+        }
+
+        const when = prompt('Enter appointment date/time (YYYY-MM-DDTHH:MM)');
+        if (!when) return;
+
+        fetch('/api/appointments/book', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                patientId: parseInt(patientId),
+                doctorId: docId,
+                appointmentTime: when,
+                notes: ''
+            })
+        }).then(async r => {
+            if (r.ok) alert('Appointment Booked Successfully!');
+            else alert('Booking failed. Please check the date format.');
+        });
+    }
+</script>
+</body>
+</html>

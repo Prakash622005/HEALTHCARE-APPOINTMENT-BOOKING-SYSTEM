@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* admin-login.css */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+body {
+    background: #2c3e50;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: #ffffff;
+    padding: 50px;
+    border-radius: 5px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    width: 350px;
+    animation: fadeIn 1s;
+    border-top: 10px solid #c0392b; /* Security Red */
+}
+
+h2 { color: #2c3e50; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
+
+input {
+    background: #ecf0f1;
+    border: none;
+    margin: 10px 0;
+    padding: 15px;
+}
+
+button {
+    background: #c0392b;
+    border-radius: 0; /* Sharp corners for a more formal look */
+    letter-spacing: 1px;
+}
+
+button:hover { background: #a93226; }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Admin Login</h2>
+
+    <form th:action="@{/admin/login}" method="post">
+        <label>Username:</label>
+        <input type="text" name="username" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+
+        <p style="color:red;" th:text="${error}"></p>
+    </form>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Appointments</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="dashboard">
+    <h1>Appointments</h1>
+    <a href="/admin/dashboard">← Back to Dashboard</a>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Doctor</th>
+            <th>Patient</th>
+            <th>Appointment Time</th>
+            <th>Status</th>
+            <th>Token No</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${appointments}">
+            <td th:text="${a.id}"></td>
+            <td th:text="${a.doctor.name}"></td>
+            <td th:text="${a.patient.name}"></td>
+            <td th:text="${#temporals.format(a.appointmentTime, 'dd-MM-yyyy HH:mm')}"></td>
+            <td th:text="${a.status}"></td>
+            <td th:text="${a.tokenNumber}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

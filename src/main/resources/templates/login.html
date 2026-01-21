@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - HABS</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <style>
+        body {
+    background: #f0f2f5;
+    font-family: 'Segoe UI', sans-serif;
+}
+.container {
+    background: white;
+    width: 380px;
+    margin: 100px auto;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+h2 { color: #0984e3; text-align: center; }
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background: #0984e3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { background: #74b9ff; }
+#message { color: #d63031; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+
+        <select id="role" required>
+            <option value="">Select Role</option>
+            <option value="patient">Patient</option>
+            <option value="doctor">Doctor</option>
+        </select>
+
+        <button type="submit">Login</button>
+    </form>
+    <div id="message"></div>
+    <a href="/register">Register here</a>
+</div>
+
+<script>
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const role = document.getElementById('role').value;
+
+        if (!role) {
+            document.getElementById('message').innerText = 'Please select a role.';
+            return;
+        }
+
+        const apiUrl = role === 'doctor' ? '/api/doctors/login' : '/api/patients/login';
+
+        try {
+            const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            console.log("Login API response:", data);
+
+            if (res.ok) {
+                // Save user session data
+                localStorage.setItem('token', data.token || '');
+                localStorage.setItem('role', role);
+
+                if (role === 'doctor') {
+                    localStorage.setItem('userId', data.doctorId || data.id);
+                    localStorage.setItem('userName', data.name || 'Doctor');
+                    window.location.href = '/doctor-dashboard';
+                } else if (role === 'patient') {
+                    localStorage.setItem('userId', data.patientId || data.id);
+                    localStorage.setItem('userName', data.name || 'Patient');
+                    window.location.href = '/dashboard';
+                }
+            } else {
+                document.getElementById('message').innerText =
+                    'Login failed: ' + (data.message || 'Invalid credentials.');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            document.getElementById('message').innerText =
+                'Server error. Please try again later.';
+        }
+    });
+</script>
+</body>
+</html>

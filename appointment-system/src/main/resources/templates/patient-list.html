@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient List</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="dashboard">
+    <h1>Patient List</h1>
+    <a href="/admin/dashboard">← Back to Dashboard</a>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Patient Name</th>
+            <th>Email</th>
+            <th>Patient Code</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${patients}">
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.name}"></td>
+            <td th:text="${p.email}"></td>
+            <td th:text="${p.patientCode}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

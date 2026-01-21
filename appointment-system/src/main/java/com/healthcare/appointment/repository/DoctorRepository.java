@@ -1,0 +1,21 @@
+package com.healthcare.appointment.repository;
+
+import com.healthcare.appointment.model.Doctor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface DoctorRepository extends JpaRepository<Doctor, Long> {
+
+    // For login
+    Optional<Doctor> findByEmail(String email);
+
+    // Add this missing method ↓
+    Optional<Doctor> findByEmailAndPassword(String email, String password);
+
+    // For search feature
+    List<Doctor> findBySpecializationContainingIgnoreCase(String specialization);
+}

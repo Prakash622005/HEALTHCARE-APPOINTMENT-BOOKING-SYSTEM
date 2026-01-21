@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Dashboard - HABS</title>
+    <style>
+        header {
+    background: #00b894;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+table {
+    width: 90%;
+    margin: 40px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+th { background: #55efc4; color: #2d3436; padding: 15px; }
+td { padding: 15px; border-bottom: 1px solid #f1f2f6; }
+button {
+    background: #00b894;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#confirmation {
+    background: #dff9fb;
+    border: 1px solid #00b894;
+    padding: 15px;
+    width: 300px;
+    margin: 20px auto;
+    border-radius: 10px;
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Patient Dashboard</h1>
+    <div>
+        <p><strong>Name:</strong> <span id="patientName"></span></p>
+        <p><strong>ID:</strong> <span id="patientId"></span></p>
+    </div>
+</header>
+
+<h2 style="text-align:center;">Available Doctors</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Select</th>
+        <th>Doctor Name</th>
+        <th>Specialization</th>
+        <th>Clinic</th>
+        <th>Address</th>
+        <th>Available Time</th>
+        <th>Fees</th>
+    </tr>
+    </thead>
+    <tbody id="doctorList"></tbody>
+</table>
+
+<div style="text-align:center;">
+    <button id="makeAppointmentBtn">Make Appointment</button>
+    <button id="logoutBtn">Logout</button>
+</div>
+
+<div id="confirmation">
+    <h3>✅ Appointment Confirmed!</h3>
+    <p>Your token number: <strong id="tokenNumber"></strong></p>
+</div>
+
+<script>
+    // ✅ Get logged-in user details
+    const patientId = localStorage.getItem("userId");
+    const patientName = localStorage.getItem("userName");
+    const role = localStorage.getItem("role");
+
+    if (!patientId || role !== "patient") {
+        alert("Unauthorized access. Please log in as a patient.");
+        window.location.href = "/login";
+    } else {
+        document.getElementById("patientName").textContent = patientName;
+        document.getElementById("patientId").textContent = patientId;
+    }
+
+    // ✅ Fetch doctors dynamically from backend
+    async function loadDoctors() {
+        try {
+            const res = await fetch("/api/appointments/doctors");
+            const doctors = await res.json();
+
+            const tbody = document.getElementById("doctorList");
+            tbody.innerHTML = "";
+
+            if (!doctors.length) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No doctors registered yet</td></tr>`;
+                return;
+            }
+
+            doctors.forEach(doc => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><input type="radio" name="doctor" value="${doc.id}"></td>
+                        <td>${doc.name}</td>
+                        <td>${doc.specialization}</td>
+                        <td>${doc.clinicName || '-'}</td>
+                        <td>${doc.address || '-'}</td>
+                        <td>${doc.availableTime || '-'}</td>
+                        <td>₹${doc.fees || '-'}</td>
+                    </tr>`;
+            });
+        } catch (err) {
+            console.error("Failed to load doctors:", err);
+        }
+    }
+
+    loadDoctors();
+
+    // ✅ Make Appointment dynamically
+    document.getElementById("makeAppointmentBtn").addEventListener("click", async () => {
+        const selectedDoctor = document.querySelector("input[name='doctor']:checked");
+        if (!selectedDoctor) {
+            alert("Please select a doctor to book an appointment.");
+            return;
+        }
+
+        const doctorId = selectedDoctor.value;
+        const patientIdNum = parseInt(patientId);
+
+        const appointmentTime = new Date().toISOString().slice(0, 16); // Current date/time in YYYY-MM-DDTHH:MM format
+
+        try {
+            const res = await fetch("/api/appointments/book", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    patientId: patientIdNum,
+                    doctorId: parseInt(doctorId),
+                    appointmentTime: appointmentTime,
+                    notes: ""
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                document.getElementById("tokenNumber").textContent = data.token;
+                document.getElementById("confirmation").style.display = "block";
+                setTimeout(() => {
+                    document.getElementById("confirmation").style.display = "none";
+                }, 3000);
+            } else {
+                alert(data.message || "Failed to book appointment. Please try again.");
+            }
+        } catch (err) {
+            console.error("Error booking appointment:", err);
+            alert("Something went wrong. Try again later.");
+        }
+    });
+
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.clear();
+        window.location.href = "/login";
+    });
+</script>
+
+</body>
+</html>

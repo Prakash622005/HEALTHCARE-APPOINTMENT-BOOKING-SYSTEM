@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Healthcare Booking - Home</title>
+    <link rel="stylesheet" href="../static/css/styles.css" />
+    <style>
+
+
+        body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+h1 { color: #2d3436; margin-bottom: 10px; }
+p { color: #636e72; margin-bottom: 30px; }
+.links a {
+    display: inline-block;
+    background: #6c5ce7;
+    color: white;
+    padding: 12px 25px;
+    margin: 10px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: transform 0.3s, background 0.3s;
+    font-weight: bold;
+}
+.links a:hover {
+    background: #a29bfe;
+    transform: translateY(-3px);
+}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Healthcare Appointment Booking</h1>
+    <p>Book a health checkup quickly.</p>
+
+    <div class="links">
+        <a href="/register">Patient Registration</a>
+        <a href="/doctor-register">Doctor Registration</a>
+        <a href="/login">Login</a>
+        <a href="/doctors">View Doctors</a>
+        <a href="/admin/login">Admin</a>
+
+    </div>
+</div>
+</body>
+</html>

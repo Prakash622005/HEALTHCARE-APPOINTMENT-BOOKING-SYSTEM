@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard {
+            width: 80%;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <h1>Admin Dashboard</h1>
+
+    <form action="/admin/enableMaintenance" method="post" style="display:inline;">
+        <button type="submit">Enable Maintenance Mode</button>
+    </form>
+
+    <form action="/admin/disableMaintenance" method="post" style="display:inline;">
+        <button type="submit">Disable Maintenance Mode</button>
+    </form>
+
+
+    <h2>Doctor List</h2>
+    <table>
+        <tr><th>ID</th><th>Name</th><th>Specialization</th></tr>
+        <tr th:each="doc : ${doctors}">
+            <td th:text="${doc.id}"></td>
+            <td th:text="${doc.name}"></td>
+            <td th:text="${doc.specialization}"></td>
+        </tr>
+    </table>
+
+    <h2>Patient List</h2>
+    <table>
+        <tr><th>ID</th><th>Name</th><th>Email</th></tr>
+        <tr th:each="p : ${patients}">
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.name}"></td>
+            <td th:text="${p.email}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
